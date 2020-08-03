@@ -9,10 +9,9 @@ import (
 )
 
 type Message struct {
-	Email       string `db:"email" json:"email"`
-	Title       string `db:"title" json:"title"`
-	Content     string `db:"content" json:"content"`
-	Magicnumber string `db:"magicnumber" json:"magicnumber"`
+	Email   string `db:"email" json:"email"`
+	Title   string `db:"title" json:"title"`
+	Content string `db:"content" json:"content"`
 }
 
 func checkErr(err error, msg string) {
@@ -23,7 +22,7 @@ func checkErr(err error, msg string) {
 
 func main() {
 	r := gin.Default()
-	v1 := r.Group("api")
+	v1 := r.Group("api/v1")
 
 	{
 		v1.POST("/message", PostMessage)
@@ -36,29 +35,6 @@ func main() {
 
 func GetCassandraIP() (IP string) {
 
-	//var IP string
-	/*
-	   //Get a new client
-	   client, err := api.NewClient(api.DefaultConfig())
-	   if err != nil {
-	      panic(err)
-	   }
-
-	    agent := client.Agent()
-	    services, err := agent.Services()
-
-	    fmt.Println("services : ", services)
-	        if err != nil {
-	                log.Fatal("err: %v", err)
-	        }
-
-	        if _, ok := services["cassandra"]; !ok {
-	                log.Fatal("missing service: %v", services)
-	        }
-
-	    IP = services["cassandra"].Address
-	    fmt.Println(" Service cassandra IP : ", services["cassandra"].Address)
-	*/
 	IP = "127.0.0.1"
 	fmt.Println(" Service cassandra IP : ", IP)
 	return
@@ -89,8 +65,8 @@ func GetMessages(c *gin.Context) {
 	var messages []Message
 	var message Message
 
-	iter := session.Query("SELECT email, title, content, magicnumber FROM message WHERE email=?", email).Iter()
-	for iter.Scan(&message.Email, &message.Title, &message.Content, &message.Magicnumber) {
+	iter := session.Query("SELECT email FROM message WHERE email=?", email).Iter()
+	for iter.Scan(&message.Email) {
 
 		// fmt.Println("1 : ", message.Class, message.Name, message.Blob)
 		messages = append(messages, message)
